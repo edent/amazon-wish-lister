@@ -73,10 +73,6 @@ if($content == '')
 }
 else
 {
-	echo "CONTENT IS \n";
-	echo $content;
-	echo "CONTENT WAS \n";
-	
 	//get all pages
 	//if the count of itemWrapper is > 0 it's the old wishlist
 	if(count(pq('tbody.itemWrapper')) > 0)
@@ -100,7 +96,7 @@ else
 	for($page_num=1; $page_num<=$pages; $page_num++)
 	{
 		$contents = phpQuery::newDocumentFile("$baseurl/registry/wishlist/$amazon_id?$reveal&$sort&layout=standard&page=$page_num");
-		// echo "CONTENT " . $contents;
+
 		if($contents == '')
 		{
 			echo('ERROR');
@@ -249,7 +245,7 @@ function rss_encode($data) {
 			<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 				<channel>
 					<title>Amazon Wishlist</title>
-					<description>Edent3</description>
+					<description></description>
 					<link>'.$link.'</link>
 					<language>en-gb</language>
 					<pubDate>'.$pubDate.'</pubDate>';
@@ -286,8 +282,8 @@ if (is_array($values)){
 		}
 	}
 } else {
-    echo "NOT AN ARRAY: \n";
-    var_dump($data);
+    echo('ERROR');
+	die();
 }
 
 	$rss .= '</channel>
