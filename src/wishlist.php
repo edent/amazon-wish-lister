@@ -73,6 +73,10 @@ if($content == '')
 }
 else
 {
+	echo "CONTENT IS \n";
+	echo $content;
+	echo "CONTENT WAS \n";
+	
 	//get all pages
 	//if the count of itemWrapper is > 0 it's the old wishlist
 	if(count(pq('tbody.itemWrapper')) > 0)
@@ -96,7 +100,7 @@ else
 	for($page_num=1; $page_num<=$pages; $page_num++)
 	{
 		$contents = phpQuery::newDocumentFile("$baseurl/registry/wishlist/$amazon_id?$reveal&$sort&layout=standard&page=$page_num");
-
+		// echo "CONTENT " . $contents;
 		if($contents == '')
 		{
 			echo('ERROR');
@@ -128,7 +132,7 @@ else
 						$array[$i]['rating'] = pq($item)->find('span.asinReviewsSummary a span span')->html();
 						$array[$i]['total-ratings'] = pq($item)->find('span.crAvgStars a:nth-child(2)')->html();
 						$array[$i]['comment'] = text_prepare(pq($item)->find('span.commentValueText')->html());
-						$array[$i]['picture'] = pq($item)->find('td.productImage a img')->attr('src');
+						$array[$i]['picture'] = get_ssl_image(pq($item)->find('td.productImage a img')->attr('src'));
 						$array[$i]['page'] = $page_num;
 						$array[$i]['ASIN'] = get_ASIN($array[$i]['link']);
 						$array[$i]['large-ssl-image'] = get_large_ssl_image($array[$i]['picture']);
@@ -173,7 +177,7 @@ else
 						$array[$i]['rating'] = 'N/A';
 						$array[$i]['total-ratings'] = $total_ratings;
 						$array[$i]['comment'] = text_prepare((pq($item)->find('span[id^="itemComment_"]')->html()));
-						$array[$i]['picture'] = pq($item)->find('div[id^="itemImage_"] img')->attr('src');
+						$array[$i]['picture'] = get_ssl_image(pq($item)->find('div[id^="itemImage_"] img')->attr('src'));
 						$array[$i]['page'] = $page_num;
 						$array[$i]['ASIN'] = get_ASIN($array[$i]['link']);
 						$array[$i]['large-ssl-image'] = get_large_ssl_image($array[$i]['picture']);
@@ -235,7 +239,9 @@ function rss_encode($data) {
 
 	//	Most recent item
 	//	Should really be RFC-822
-	$pubDate = $data[0]['date-added'];
+	$amazon_date = date_parse_from_format("d M, Y", $data[0]['date-added']);
+	$pubDate =  date(DATE_RSS,mktime(0,0,0,$amazon_date['month'], $amazon_date['day'], $amazon_date['year']));
+	// $pubDate = $data[0]['date-added'];
 
 	$link = htmlspecialchars("{$baseurl}/registry/wishlist/{$amazon_id}?{$reveal}&{$sort}&layout=standard");
 
@@ -243,11 +249,11 @@ function rss_encode($data) {
 			<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 				<channel>
 					<title>Amazon Wishlist</title>
-					<description></description>
+					<description>Edent3</description>
 					<link>'.$link.'</link>
 					<language>en-gb</language>
 					<pubDate>'.$pubDate.'</pubDate>';
-
+if (is_array($values)){
 	foreach( $data as $key => $value )
 	{
 		if( is_array($value) )
@@ -257,7 +263,11 @@ function rss_encode($data) {
 			} else {
 				$image = $value['large-ssl-image'];
 			}
-			
+
+			$item_date = date_parse_from_format("d M, Y", $value['date-added']);
+			$itemPubDate =  date(DATE_RSS,mktime(0,0,0,$item_date['month'], $item_date['day'], $item_date['year']));
+	
+
 			$rss .= '<item>
 						<title>'.$value['comment'].' '.$value['new-price'] .'</title>
 						<link>'.htmlspecialchars($value['affiliate-url']).'</link>
@@ -270,11 +280,15 @@ function rss_encode($data) {
 								</a>
 							]]>
 						</description>
-						<pubDate>'.$value['date-added'].'</pubDate>
+						<pubDate>'.$itemPubDate.'</pubDate>
 						<guid>'.htmlspecialchars($value['affiliate-url']).'</guid>
 					</item>';
 		}
 	}
+} else {
+    echo "NOT AN ARRAY: \n";
+    var_dump($data);
+}
 
 	$rss .= '</channel>
 			</rss>';
@@ -329,6 +343,21 @@ function get_large_ssl_image($image_url) {
 	return $largeSSLImage;
 }
 
+function get_ssl_image($image_url) {
+	/*
+		Change
+			http://ecx.images-amazon.com/images/I/41kWB4Z4PTL._SL250_.jpg
+		To
+			https://images-eu.ssl-images-amazon.com/images/I/41kWB4Z4PTL._SL250_.jpg
+
+		Image URLs are always .com for some reason.
+	*/
+
+	$SSLImage = str_replace("http://ecx.images-amazon.com", 'https://images-eu.ssl-images-amazon.com', $image_url);
+
+	return $SSLImage;
+}
+
 function get_affiliate_link($AISN) {
 
 	/*
@@ -360,23 +389,23 @@ function get_gift_link($url) {
 
 //?format=json
 //format the wishlist (json, xml, or php array object) defaults to json
-if($_REQUEST['format'] == 'json') {
+if($_GET['format'] == 'json') {
 	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode($array);
 }
-elseif($_REQUEST['format'] == 'xml') {
+elseif($_GET['format'] == 'xml') {
 	header('Content-Type: text/xml; charset=utf-8');
 	echo xml_ecode($array);
 }
-elseif($_REQUEST['format'] == 'XML') {
+elseif($_GET['format'] == 'XML') {
 	header('Content-Type: text/xml; charset=utf-8');
 	echo xml_encode($array, new SimpleXMLElement('<?xml version="1.0"?><data></data>'));
 }
-elseif($_REQUEST['format'] == 'array') {
+elseif($_GET['format'] == 'array') {
 	header('Content-Type: text/html; charset=utf-8');
 	print_r($array);
 }
-elseif($_REQUEST['format'] == 'rss') {
+elseif($_GET['format'] == 'rss') {
 	header('Content-Type: application/rss+xml; charset=utf-8');
 	echo rss_encode($array);
 }
