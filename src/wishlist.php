@@ -68,7 +68,7 @@ $i = 0;
 
 if($content == '')
 {
-	echo('ERROR');
+	// echo('ERROR');
 	die();
 }
 else
@@ -99,7 +99,7 @@ else
 
 		if($contents == '')
 		{
-			echo('ERROR');
+			// echo('ERROR');
 			die();
 		}
 		else
@@ -249,7 +249,8 @@ function rss_encode($data) {
 					<link>'.$link.'</link>
 					<language>en-gb</language>
 					<pubDate>'.$pubDate.'</pubDate>';
-if (is_array($values)){
+
+if (is_array($data)){
 	foreach( $data as $key => $value )
 	{
 		if( is_array($value) )
@@ -282,7 +283,7 @@ if (is_array($values)){
 		}
 	}
 } else {
-    echo('ERROR');
+    // echo('ERROR');
 	die();
 }
 
