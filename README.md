@@ -32,6 +32,7 @@ You should now see an RSS feed with all your wishlist items.
 
 ### Amazon Country
 `?tld=AMAZON_COUNTRY`
+
 `?tld=co.uk`
 
 Defaults to `com`.
@@ -42,26 +43,38 @@ The following stores currently do not offer wishlists: `com.au`, `com.mx`, `nl`.
 
 ### Amazon ID
 `?id=YOUR_AMAZON_ID`
+
 `?id=13GFCFR2B2IX4`
 
 ### Reveal (What to get)
 `?reveal=unpurchased` (Default)
+
 `?reveal=all`
+
 `?reveal=purchased`
 
 ### Sort
 `?sort=date` (Default)
+
 `?sort=priority`
+
 `?sort=title`
+
 `?sort=price-low`  (low to high)
+
 `?sort=price-high` (high to low)
+
 `?sort=updated`
 
 ### Output Format
 `?format=json` Valid JSON (Default).
+
 `?format=xml` Invalid XML (included for compatibility reasons).
+
 `?format=XML` Valid XML.
+
 `?format=array` a PHP array.
+
 `?format=rss` an RSS feed.
 
 ## Amazon Associate / Affiliate tag
