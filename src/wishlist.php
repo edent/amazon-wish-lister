@@ -25,6 +25,8 @@ else $amazon_id = '37XI10RRD17X2';
 if(isset($_GET['tld'])) $amazon_country = $_GET['tld'];
 else $amazon_country = 'com';
 
+$baseurl = 'http://www.amazon.' . $amazon_country;
+
 //?reveal=unpurchased
 //checks what to reveal (unpurchased, all, or purchased)... defaults to unpurchased
 if($_GET['reveal'] == 'unpurchased') $reveal = 'reveal=unpurchased';
@@ -62,8 +64,24 @@ else $gift = false;
 if(isset($_GET['small-image'])) $smallImage = $_GET['small-image'];
 else $smallImage = false;
 
-$baseurl = 'http://www.amazon.' . $amazon_country;
-$content = phpQuery::newDocumentFile("$baseurl/registry/wishlist/$amazon_id?$reveal&$sort&layout=standard");
+//?cache=3600
+//	Amazon don't like repeated requests. By default, this caches the page for 1 hour (3600 seconds)
+if(isset($_GET['cache'])) $cacheTime = intval($_GET['cache']);
+else $cacheTime = 3600;
+
+//	Check for cache
+// co.uk37XI10RRD17X2reveal=unpurchasedsort=date-added
+$cacheName = $amazon_country . $amazon_id . $reveal . $sort;
+
+//	Is there a cache? Is it under an hour old?
+if (file_exists($cacheName) && ((time() - filemtime($cacheName)) < $cacheTime)) {
+	$content = phpQuery::newDocumentFile($cacheName);
+} else {
+	$content = phpQuery::newDocumentFile("$baseurl/registry/wishlist/$amazon_id?$reveal&$sort&layout=standard");
+	//	Write the cache
+	file_put_contents($cacheName,$content);
+}
+
 $i = 0;
 
 if($content == '')
@@ -263,7 +281,7 @@ if (is_array($data)){
 
 			$item_date = date_parse_from_format("d M, Y", $value['date-added']);
 			$itemPubDate =  date(DATE_RSS,mktime(0,0,0,$item_date['month'], $item_date['day'], $item_date['year']));
-	
+
 
 			$rss .= '<item>
 						<title>'.$value['comment'].' '.$value['new-price'] .'</title>
