@@ -6,8 +6,7 @@ This is a little API to retrieve Amazon Wish List data. There is no official API
 
 The two files `wishlist.php` and `phpquery.php` will need to be placed on a webserver running [PHP](https://php.net).
 
-If you do not have a webserver, you can use the [free servers at 000WebHost](https://www.000webhost.com/921806.html).
-
+If you do not have a webserver, you can set one up on your computer using [XAMPP](https://www.apachefriends.org/)
 ## Basic Usage
 
 A normal Amazon wishlist URL looks like this - https://www.amazon.co.uk/gp/registry/wishlist/13GFCFR2B2IX4/
