@@ -25,7 +25,7 @@ else $amazon_id = '37XI10RRD17X2';
 if(isset($_GET['tld'])) $amazon_country = $_GET['tld'];
 else $amazon_country = 'com';
 
-$baseurl = 'http://www.amazon.' . $amazon_country;
+$baseurl = 'https://www.amazon.' . $amazon_country;
 
 //?reveal=unpurchased
 //checks what to reveal (unpurchased, all, or purchased)... defaults to unpurchased
@@ -347,14 +347,18 @@ function get_large_ssl_image($image_url) {
 		Change
 			http://ecx.images-amazon.com/images/I/41kWB4Z4PTL._SL250_.jpg
 		To
-			https://images-eu.ssl-images-amazon.com/images/I/41kWB4Z4PTL._SL2500_.jpg
+			https://images-eu.ssl-images-amazon.com/images/I/41kWB4Z4PTL.jpg
 
 		Image URLs are always .com for some reason.
 	*/
 
 	$largeSSLImage = str_replace("http://ecx.images-amazon.com", 'https://images-eu.ssl-images-amazon.com', $image_url);
-	$largeSSLImage = str_replace("_.jpg", '0_.jpg', $largeSSLImage);
-
+	
+	//	Replace the useless cruft at the end
+	$last = strrpos($largeSSLImage, "_");
+	$next_to_last = strrpos($largeSSLImage, "_", $last - strlen($largeSSLImage) - 1);
+	$largeSSLImage = substr($largeSSLImage, 0, $next_to_last);
+	
 	return $largeSSLImage;
 }
 
