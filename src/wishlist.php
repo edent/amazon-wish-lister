@@ -355,9 +355,11 @@ function get_large_ssl_image($image_url) {
 	$largeSSLImage = str_replace("http://ecx.images-amazon.com", 'https://images-eu.ssl-images-amazon.com', $image_url);
 	
 	//	Replace the useless cruft at the end
-	$last = strrpos($largeSSLImage, "_");
-	$next_to_last = strrpos($largeSSLImage, "_", $last - strlen($largeSSLImage) - 1);
-	$largeSSLImage = substr($largeSSLImage, 0, $next_to_last);
+	$largeSSLImage = str_replace("_SS135_", '', $largeSSLImage);
+
+	// $last = strrpos($largeSSLImage, "_");
+	// $next_to_last = strrpos($largeSSLImage, "_", $last - strlen($largeSSLImage) - 1);
+	// $largeSSLImage = substr($largeSSLImage, 0, $next_to_last);
 	
 	return $largeSSLImage;
 }
